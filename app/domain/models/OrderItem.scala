@@ -5,7 +5,7 @@ import play.api.libs.json.{Json, OFormat}
 /**
  * The OrderItem class
  */
-case class OrderItem(id: Option[Long], orderId: Long, productId: Long,price: BigDecimal, quantity: Int) {
+case class OrderItem(id: Option[Long], orderId: Long, productId: Long, price: Double, quantity: Int) {
   object OrderItem {
 
     /**

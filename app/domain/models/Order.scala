@@ -5,7 +5,7 @@ import play.api.libs.json.{Json, OFormat}
 import java.time.LocalDateTime
 
 /**
- * The order class
+ * The Order class
  */
 case class Order(id: Option[Long], userId: Long, totalPrice: BigDecimal, orderDate: LocalDateTime) {
   object Order {
