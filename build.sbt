@@ -76,6 +76,7 @@ val appDependencies = Seq(
   "com.typesafe.akka" %% "akka-http" % "10.1.15",
 
   "org.joda" % "joda-convert" % "2.2.3",
+  "joda-time" % "joda-time" % "2.10.13",
 
   "org.scala-lang.modules" %% "scala-java8-compat" % "1.0.2",
 
