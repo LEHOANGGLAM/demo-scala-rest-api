@@ -10,7 +10,7 @@ create table scalademo.users
     email           varchar(100) not null,
     role            varchar(16)  not null,
     birthDate       timestamp    not null,
-    address         varchar(16)  not null,
+    address         varchar(100)  not null,
     phoneNumber     varchar(16)  not null
 );
 

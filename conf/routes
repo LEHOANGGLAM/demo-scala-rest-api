@@ -6,6 +6,11 @@
 # An example controller showing a sample home page
 GET     /                              controllers.HomeController.index()
 
+
+GET         /unsecured                         controllers.auth.UnsecuredResourceController.index
+POST        /signUp                            controllers.auth.AuthController.signUp
+POST        /signIn                            controllers.auth.AuthController.signIn
+
 GET    /products                       controllers.product.ProductController.getAll()
 GET    /products/:id                   controllers.product.ProductController.getById(id: Long)
 

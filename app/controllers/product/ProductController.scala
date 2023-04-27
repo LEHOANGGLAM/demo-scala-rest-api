@@ -18,7 +18,6 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
-import org.joda.time.LocalDateTime
 
 case class ProductFormInput(productName: String, price: Double, expDate: String)
 
