@@ -12,13 +12,13 @@ class ProductTable(tag: Tag) extends Table[Product](tag, Some("scalademo"), "pro
   def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc, O.Unique)
 
   /** The productName column */
-  def productName = column[String]("productName")
+  def productName = column[String]("productname")
 
   /** The price column */
   def price = column[Double]("price")
 
   /** The expDate column */
-  def expDate = column[LocalDateTime]("expDate")
+  def expDate = column[LocalDateTime]("expdate")
 
   /**
    * This is the table's default "projection".

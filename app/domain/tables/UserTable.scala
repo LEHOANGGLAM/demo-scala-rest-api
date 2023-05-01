@@ -12,7 +12,7 @@ class UserTable(tag: Tag) extends Table[User](tag, Some("scalademo"), "users") {
   def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc, O.Unique)
 
   /** The name column */
-  def firstName = column[String]("firstName")
+  def firstName = column[String]("firstname")
 
   /** The last name column */
   def lastName = column[String]("lastname")
@@ -28,13 +28,13 @@ class UserTable(tag: Tag) extends Table[User](tag, Some("scalademo"), "users") {
 
 
   /** The birthDate column */
-  def birthDate = column[LocalDateTime]("birthDate")
+  def birthDate = column[LocalDateTime]("birthdate")
 
   /** The address column */
   def address = column[String]("address")
 
   /** The phoneNumber column */
-  def phoneNumber = column[String]("phoneNumber")
+  def phoneNumber = column[String]("phonenumber")
 
   /**
    * This is the table's default "projection".

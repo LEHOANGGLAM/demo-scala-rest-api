@@ -4,15 +4,29 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                              controllers.HomeController.index()
-
 
 GET         /unsecured                         controllers.auth.UnsecuredResourceController.index
 POST        /signUp                            controllers.auth.AuthController.signUp
 POST        /signIn                            controllers.auth.AuthController.signIn
 
-GET    /products                       controllers.product.ProductController.getAll()
-GET    /products/:id                   controllers.product.ProductController.getById(id: Long)
+GET         /users                              controllers.user.UserController.getAll()
+GET         /users/:id                          controllers.user.UserController.getById(id: Long)
+POST        /users                              controllers.user.UserController.create()
+PUT         /users/:id                          controllers.user.UserController.update(id: Long)
+DELETE      /users/:email                       controllers.user.UserController.delete(email)
+
+GET         /products                       controllers.product.ProductController.getAll()
+GET         /products/:id                   controllers.product.ProductController.getById(id: Long)
+POST        /products                       controllers.product.ProductController.create()
+PUT         /products/:id                   controllers.product.ProductController.update(id: Long)
+DELETE      /products/:id                   controllers.product.ProductController.delete(id: Long)
+
+GET         /orders                       controllers.order.OrderController.getAll()
+GET         /orders/:id                   controllers.order.OrderController.getById(id: Long)
+POST        /orders                       controllers.order.OrderController.create()
+PUT         /orders/:id                   controllers.order.OrderController.update(id: Long)
+DELETE      /orders/:id                   controllers.order.OrderController.delete(id: Long)
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
