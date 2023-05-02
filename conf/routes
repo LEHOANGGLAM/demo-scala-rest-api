@@ -23,9 +23,7 @@ DELETE      /products/:id                   controllers.product.ProductControlle
 
 GET         /orders                       controllers.order.OrderController.getAll()
 GET         /orders/:id                   controllers.order.OrderController.getById(id: Long)
-POST        /orders                       controllers.order.OrderController.create()
-PUT         /orders/:id                   controllers.order.OrderController.update(id: Long)
-DELETE      /orders/:id                   controllers.order.OrderController.delete(id: Long)
+
 
 
 # Map static resources from the /public folder to the /assets URL path
