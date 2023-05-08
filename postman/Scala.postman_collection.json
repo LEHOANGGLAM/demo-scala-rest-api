@@ -498,7 +498,7 @@
 			"name": "External Products",
 			"item": [
 				{
-					"name": "http://localhost:8080/products/1",
+					"name": "http://localhost:8080/external/products",
 					"request": {
 						"method": "GET",
 						"header": [
