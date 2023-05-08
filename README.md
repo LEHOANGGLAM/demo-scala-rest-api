@@ -63,8 +63,7 @@
 ### Getting Started
 
 #### 1. Setup `PostgreSQL` Database
-You can install PostgreSQL on your local machine or running the docker compose in the `/docker/database` folder
-to get PostgreSQL ready.
+You can install PostgreSQL on your local machine (need to update connection strings in ./conf/application.conf) or running the docker compose in the root folder to get PostgreSQL ready.
 
 #### 2. Run application 
 You need to download and install sbt for this application to run.
