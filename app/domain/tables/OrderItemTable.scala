@@ -11,13 +11,10 @@ class OrderItemTable(tag: Tag) extends Table[OrderItem](tag, Some("scalademo"), 
   def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc, O.Unique)
 
   /** The orderId column */
-  def orderId = column[Long]("orderId")
+  def orderId = column[Long]("orderid")
 
   /** The productId column */
-  def productId = column[Long]("productId")
-
-  /** The userId column */
-  def userId = column[Long]("userId")
+  def productId = column[Long]("productid")
 
   /** The quantity column */
   def quantity = column[Int]("quantity")

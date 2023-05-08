@@ -12,7 +12,7 @@ import play.api.data.Form
 import play.api.data.format.Formats.doubleFormat
 import play.api.libs.json.{JsString, Json}
 import play.api.mvc._
-import services.{ProductService, UserService}
+import services.{ExternalProductService, ProductService}
 import utils.auth.{JWTEnvironment, WithProvider, WithRole}
 import utils.logging.RequestMarkerContext
 
@@ -28,8 +28,7 @@ case class ProductFormInput(productName: String, price: Double, expDate: LocalDa
  */
 class ProductController @Inject()(cc: ControllerComponents,
                                   productService: ProductService,
-                                  // extProductService: ExternalProductService,
-                                  userService: UserService,
+                                  extProductService: ExternalProductService,
                                   silhouette: Silhouette[JWTEnvironment])
                                  (implicit ec: ExecutionContext)
   extends AbstractController(cc) with RequestMarkerContext {
@@ -37,18 +36,6 @@ class ProductController @Inject()(cc: ControllerComponents,
   def SecuredAction: SecuredActionBuilder[JWTEnvironment, AnyContent] = silhouette.SecuredAction
 
   private val logger = Logger(getClass)
-
-  private val form: Form[ProductFormInput] = {
-    import play.api.data.Forms._
-
-    Form(
-      mapping(
-        "productName" -> nonEmptyText(maxLength = 128),
-        "price" -> of[Double],
-        "expDate" -> localDateTime("yyyy-MM-dd'T'HH:mm:ss")
-      )(ProductFormInput.apply)(ProductFormInput.unapply)
-    )
-  }
 
   def getById(id: Long): Action[AnyContent] =
     SecuredAction(WithProvider[JWTAuthenticator](CredentialsProvider.ID)).async { implicit request =>
@@ -89,38 +76,18 @@ class ProductController @Inject()(cc: ControllerComponents,
       }
     }
 
-  //  def getAllExternal: Action[AnyContent] =
-  //    SecuredAction(WithRole[JWTAuthenticator]("User", "Creator", "Contributor")).async { implicit request =>
-  //      logger.trace("getAll External Products")
-  //
-  //      // try/catch Future exception with transform
-  //      extProductService.listAll().transform {
-  //        case Failure(exception) => handleExternalError(exception)
-  //        case Success(products => Try(Ok(Json.toJson(products.map(product => ProductResource.fromProduct(product)))))
-  //      }
-  //    }
-  //
-  //  def createExternal: Action[AnyContent] =
-  //    SecuredAction(WithRole[JWTAuthenticator]("Creator")).async { implicit request =>
-  //      logger.trace("create External Product: ")
-  //
-  //      def failure(badForm: Form[ProductFormInput]) = {
-  //        Future.successful(BadRequest(JsString("Invalid Input")))
-  //      }
-  //
-  //      def success(input: ProductFormInput) = {
-  //        // create a product from given form input
-  //        val product = null;// Product(Some(999L), input.author, input.title, input.content, LocalDateTime.now(), input.description)
-  //
-  //        extProductService.save(product).transform {
-  //          case Failure(exception) => handleExternalError(exception)
-  //          case Success(product) => Try(Created(Json.toJson(ProductResource.fromProduct(product))))
-  //        }
-  //      }
-  //
-  //      form.bindFromRequest().fold(failure, success)
-  //    }
-  //
+  def getExternalProducts: Action[AnyContent] =
+    SecuredAction(WithRole[JWTAuthenticator]("Operator", "Admin")).async { implicit request =>
+      logger.trace("getAll External Products")
+
+      // try/catch Future exception with transform
+      extProductService.listAll().transform {
+        case Failure(exception) => handleExternalError(exception)
+        case Success(products) => Try(
+          Ok(Json.toJson(products.map(product => ProductResource.fromProduct(product))))
+       )
+      }
+    }
   private def handleExternalError(throwable: Throwable): Try[Result] = {
     throwable match {
       case ese: ExternalServiceException =>
@@ -134,6 +101,18 @@ class ProductController @Inject()(cc: ControllerComponents,
     }
   }
 
+  private val form: Form[ProductFormInput] = {
+    import play.api.data.Forms._
+
+    Form(
+      mapping(
+        "productName" -> nonEmptyText(maxLength = 128),
+        "price" -> of[Double],
+        "expDate" -> localDateTime("yyyy-MM-dd'T'HH:mm:ss")
+      )(ProductFormInput.apply)(ProductFormInput.unapply)
+    )
+  }
+
   private def processJsonProduct[A](id: Option[Long])(implicit request: Request[A]): Future[Result] = {
 
     def failure(badForm: Form[ProductFormInput]) = {
@@ -144,8 +123,14 @@ class ProductController @Inject()(cc: ControllerComponents,
       // create a post from given form input
       val pro = Product(id, input.productName, input.price, input.expDate)
 
-      productService.save(pro).map { pro =>
-        Created(Json.toJson(ProductResource.fromProduct(pro)))
+      if (id.isDefined) {
+        productService.update(pro).map { pro =>
+          Created(Json.toJson(ProductResource.fromProduct(pro)))
+        }
+      }else{
+        productService.save(pro).map { pro =>
+          Created(Json.toJson(ProductResource.fromProduct(pro)))
+        }
       }
     }
 

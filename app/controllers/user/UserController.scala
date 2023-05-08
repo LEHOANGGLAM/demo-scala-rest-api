@@ -2,23 +2,21 @@ package controllers.user
 
 import com.mohiva.play.silhouette.api.Silhouette
 import com.mohiva.play.silhouette.api.actions.SecuredActionBuilder
+import com.mohiva.play.silhouette.api.util.PasswordHasherRegistry
 import com.mohiva.play.silhouette.impl.authenticators.JWTAuthenticator
-import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
-import domain.models.{Product, User}
-import httpclient.ExternalServiceException
+import domain.models.User
 import play.api.Logger
 import play.api.data.Form
-import play.api.data.format.Formats.doubleFormat
 import play.api.libs.json.{JsString, Json}
 import play.api.mvc._
-import services.{ProductService, UserService}
-import utils.auth.{JWTEnvironment, WithProvider, WithRole}
+import services.UserService
+import utils.auth.{JWTEnvironment, WithRole}
 import utils.logging.RequestMarkerContext
 
 import java.time.LocalDateTime
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
+
 
 case class UserFormInput(email: String, role: String, firstName: String, lastName: String, password: Option[String] = None,
                          address: String, phoneNumber: String, birthDate: LocalDateTime)
@@ -27,9 +25,10 @@ case class UserFormInput(email: String, role: String, firstName: String, lastNam
  * Takes HTTP requests and produces JSON.
  */
 class UserController @Inject()(cc: ControllerComponents,
-                                  userService: UserService,
-                                  silhouette: Silhouette[JWTEnvironment])
-                                 (implicit ec: ExecutionContext)
+                               userService: UserService,
+                               passwordHasherRegistry: PasswordHasherRegistry,
+                               silhouette: Silhouette[JWTEnvironment])
+                              (implicit ec: ExecutionContext)
   extends AbstractController(cc) with RequestMarkerContext {
 
   def SecuredAction: SecuredActionBuilder[JWTEnvironment, AnyContent] = silhouette.SecuredAction
@@ -54,7 +53,7 @@ class UserController @Inject()(cc: ControllerComponents,
   }
 
   def getById(id: Long): Action[AnyContent] =
-    SecuredAction(WithRole[JWTAuthenticator]( "Admin")).async { implicit request =>
+    SecuredAction(WithRole[JWTAuthenticator]("Admin")).async { implicit request =>
       logger.trace(s"getById: $id")
       userService.find(id).map {
         case Some(user) => Ok(Json.toJson(UserResource.fromUser(user)))
@@ -84,7 +83,7 @@ class UserController @Inject()(cc: ControllerComponents,
     }
 
   def delete(email: String): Action[AnyContent] =
-    SecuredAction(WithRole[JWTAuthenticator]( "Admin")).async { implicit request =>
+    SecuredAction(WithRole[JWTAuthenticator]("Admin")).async { implicit request =>
       logger.trace("delete User")
       userService.delete(email).map { deletedCnt =>
         if (deletedCnt == 1) Ok(JsString(s"Delete user $email successfully"))
@@ -101,10 +100,17 @@ class UserController @Inject()(cc: ControllerComponents,
     def success(input: UserFormInput) = {
       // create a user from given form input
       val user = User(id, input.email, input.role, input.firstName,
-        input.lastName,input.password, input.address, input.phoneNumber, input.birthDate)
+        input.lastName, Some(passwordHasherRegistry.current.hash(input.password.get).password),
+        input.address, input.phoneNumber, input.birthDate)
 
-      userService.save(user).map { user =>
-        Created(Json.toJson(UserResource.fromUser(user)))
+      if (id.isDefined) {
+        userService.update(user).map { user =>
+          Created(Json.toJson(UserResource.fromUser(user)))
+        }
+      } else {
+        userService.save(user).map { user =>
+          Created(Json.toJson(UserResource.fromUser(user)))
+        }
       }
     }
 

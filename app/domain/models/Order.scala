@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 /**
  * The Order class
  */
-case class Order(id: Option[Long], userId: Long, totalPrice: BigDecimal, orderDate: LocalDateTime) {
+case class Order(id: Option[Long], userId: Long, totalPrice: BigDecimal, orderDate: LocalDateTime = LocalDateTime.now()) {
   object Order {
 
     /**

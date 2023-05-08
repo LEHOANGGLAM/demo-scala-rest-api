@@ -6,8 +6,7 @@ import play.api.libs.ws._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class AbstractHttpClient(ws: WSClient) (implicit ec: ExecutionContext) {
-
+abstract class AbstractHttpClient(ws: WSClient)(implicit ec: ExecutionContext) {
   protected def provideAuth: (String, String, WSAuthScheme)
 
   protected def provideRequestFilters: Seq[WSRequestFilter]
@@ -22,7 +21,13 @@ abstract class AbstractHttpClient(ws: WSClient) (implicit ec: ExecutionContext) 
   def get(url: String,
           params: Seq[(String, String)],
           extraHeaders: Seq[(String, String)]): Future[WSResponse] =
-    execute(url = url, method = GET, params = params, requestBody = None, extraHeaders = extraHeaders)
+    execute(
+      url = url,
+      method = GET,
+      params = params,
+      requestBody = None,
+      extraHeaders = extraHeaders
+    )
 
   /**
    * Do PUT request
@@ -36,7 +41,13 @@ abstract class AbstractHttpClient(ws: WSClient) (implicit ec: ExecutionContext) 
           params: Seq[(String, String)],
           requestBody: Option[JsValue],
           extraHeaders: Seq[(String, String)]): Future[WSResponse] =
-    execute(url = url, method = PUT, params = params, requestBody = requestBody, extraHeaders = extraHeaders)
+    execute(
+      url = url,
+      method = PUT,
+      params = params,
+      requestBody = requestBody,
+      extraHeaders = extraHeaders
+    )
 
   /**
    * Do POST request
@@ -50,7 +61,13 @@ abstract class AbstractHttpClient(ws: WSClient) (implicit ec: ExecutionContext) 
            requestBody: Option[JsValue],
            params: Seq[(String, String)],
            extraHeaders: Seq[(String, String)]): Future[WSResponse] =
-    execute(url = url, method = POST, params = params, requestBody = requestBody, extraHeaders = extraHeaders)
+    execute(
+      url = url,
+      method = POST,
+      params = params,
+      requestBody = requestBody,
+      extraHeaders = extraHeaders
+    )
 
   /**
    * Do DELETE request
@@ -62,7 +79,13 @@ abstract class AbstractHttpClient(ws: WSClient) (implicit ec: ExecutionContext) 
   def delete(url: String,
              params: Seq[(String, String)],
              extraHeaders: Seq[(String, String)]): Future[WSResponse] =
-    execute(url = url, method = DELETE, params = params, requestBody = None, extraHeaders = extraHeaders)
+    execute(
+      url = url,
+      method = DELETE,
+      params = params,
+      requestBody = None,
+      extraHeaders = extraHeaders
+    )
 
   /**
    * Build WSRequest to perform
@@ -78,19 +101,26 @@ abstract class AbstractHttpClient(ws: WSClient) (implicit ec: ExecutionContext) 
                            params: Seq[(String, String)],
                            requestBody: Option[JsValue],
                            extraHeaders: Seq[(String, String)]): WSRequest = {
-
     // Set up URL and request method
     var wsRequest = ws.url(url).withMethod(method)
+
     // Include request params?
     params.foreach(p => wsRequest = wsRequest.withQueryStringParameters(p))
+
     // Include request body?
     requestBody.foreach(body => wsRequest = wsRequest.withBody(body))
+
     // Include additional headers?
     extraHeaders.foreach(h => wsRequest = wsRequest.addHttpHeaders(h))
 
     val (username, password, authScheme) = provideAuth
+
     wsRequest = wsRequest.withAuth(username, password, authScheme)
-    provideRequestFilters.foreach(filter => wsRequest = wsRequest.withRequestFilter(filter))
+
+    provideRequestFilters.foreach(
+      filter => wsRequest = wsRequest.withRequestFilter(filter)
+    )
+
     wsRequest
   }
 
@@ -100,5 +130,4 @@ abstract class AbstractHttpClient(ws: WSClient) (implicit ec: ExecutionContext) 
                       requestBody: Option[JsValue],
                       extraHeaders: Seq[(String, String)]): Future[WSResponse] =
     buildRequest(url, method, params, requestBody, extraHeaders).execute()
-
 }

@@ -11,13 +11,13 @@ class OrderTable(tag: Tag) extends Table[Order](tag, Some("scalademo"), "orders"
   def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc, O.Unique)
 
   /** The userId column */
-  def userId = column[Long]("userId")
+  def userId = column[Long]("userid")
 
   /** The totalPrice column */
-  def totalPrice = column[BigDecimal]("totalPrice")
+  def totalPrice = column[BigDecimal]("totalprice")
 
   /** The orderDate column */
-  def orderDate = column[LocalDateTime]("orderDate")
+  def orderDate = column[LocalDateTime]("orderdate")
 
   /**
    * This is the table's default "projection".
