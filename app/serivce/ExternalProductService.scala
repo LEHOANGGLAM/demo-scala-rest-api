@@ -53,8 +53,4 @@ class ExternalProductServiceImpl @Inject()(
   override def save(Product: Product): Future[Product] =
     client.post[Product](createProduct, Some(Json.toJson(Product)))
 
-  import play.api.libs.json._
-
-  implicit val productReads: Reads[Product] = Json.reads[Product]
-  implicit val productWrites: Writes[Product] = Json.writes[Product]
 }

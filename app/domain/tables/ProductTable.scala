@@ -27,5 +27,5 @@ class ProductTable(tag: Tag) extends Table[Product](tag, Some("scalademo"), "pro
    * apply and unapply methods.
    */
   def * =
-    (id, productName, price,expDate) <> ((Product.apply _).tupled, Product.unapply)
+    (id, productName, price, expDate) <> ((Product.apply _).tupled, Product.unapply)
 }
